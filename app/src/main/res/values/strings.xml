@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Room Scanner</string>
+    <string name="scan_your_room">Scan your room</string>
+    <string name="saved_models">Saved models</string>
+    <string name="feedback">Feedback</string>
+    <string name="what_should_we_improve">What should we improve?</string>
+    <string name="send">Send</string>
+    <string name="noise">Noise</string>
+    <string name="countours">Countours</string>
+    <string name="capture">Capture</string>
+    <string name="proceed">Proceed</string>
+</resources>

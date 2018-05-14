@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pwr.piotr.androidproject.ScannerActivity">
+
+    <org.opencv.android.JavaCameraView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/java_camera_view"
+        android:adjustViewBounds="true" />
+
+    <LinearLayout
+        android:id="@+id/scharrLinearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/noise"
+            android:textColor="#FFFFFF"/>
+
+    <FrameLayout
+        android:id="@+id/scharrFrameLayout"
+        android:layout_width="32dp"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+    <SeekBar
+        android:id="@+id/scharrSeekBar"
+        android:rotation="90"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/countoursLinearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/countours"
+            android:textColor="#FFFFFF"/>
+
+        <FrameLayout
+            android:id="@+id/countoursFrameLayout"
+            android:layout_width="32dp"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:layout_gravity="center">
+
+            <SeekBar
+                android:id="@+id/contoursSeekBar"
+                android:rotation="90"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/button_capture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/capture"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>

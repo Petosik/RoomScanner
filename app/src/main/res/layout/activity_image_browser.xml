@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pwr.piotr.androidproject.ImageBrowserActivity">
+
+    <ImageView
+        android:id="@+id/browserImgView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY" />
+
+    <LinearLayout
+        android:id="@+id/scharrLinearLayoutBrowsing"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/noise"
+            android:textColor="#FFFFFF"/>
+
+        <FrameLayout
+            android:id="@+id/scharrFrameLayoutBrowsing"
+            android:layout_width="32dp"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+
+            <SeekBar
+                android:id="@+id/scharrSeekBarBrowsing"
+                android:rotation="90"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/countoursLinearLayoutBrowsing"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/countours"
+            android:textColor="#FFFFFF"/>
+
+        <FrameLayout
+            android:id="@+id/countoursFrameLayoutBrowsing"
+            android:layout_width="32dp"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:layout_gravity="center">
+
+            <SeekBar
+                android:id="@+id/contoursSeekBarBrowsing"
+                android:rotation="90"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/proceedBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/proceed"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+
+</RelativeLayout>
