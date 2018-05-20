@@ -40,7 +40,6 @@ public class EdgeDetector {
         dx = new Mat();
         dy = new Mat();
         hierarchy = new Mat();
-        //result = new Mat(new Size(),CvType.CV_8UC3);
         contoursList = new ArrayList<MatOfPoint>();
         filteredContoursList = new ArrayList<MatOfPoint>();
         blurSize = new Size(3, 3);
@@ -63,11 +62,7 @@ public class EdgeDetector {
         };
     }
 
-
     public Mat detectMat(Mat imageMat, int noise, int contours) {
-
-        long start = System.nanoTime();
-
         contoursList.clear();
 
         Imgproc.cvtColor(imageMat, imgGray, Imgproc.COLOR_BGR2GRAY);
@@ -80,30 +75,52 @@ public class EdgeDetector {
         Imgproc.findContours(edge, contoursList, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         result = new Mat(imgGray.rows(), imgGray.cols(), CvType.CV_8UC3);
 
-        long beforeSort = System.nanoTime() - start;
-
         Collections.sort(contoursList, comparator);
-        iterations = (int)(contoursList.size() * ((double) contours / 100));
-
-        long afterSort = System.nanoTime() - start;
-        Log.i(TAG, "Sorting: " + (afterSort - beforeSort));
+        iterations = (int) (contoursList.size() * ((double) contours / 100));
 
         for (int i = 0; i < iterations; i++) {
             Imgproc.drawContours(result, contoursList, i, color, 2);
         }
 
-        Log.i(TAG, "Drawing: " + (System.nanoTime() - start - afterSort));
-
         return result;
     }
 
+    private Mat bitmapToMat(Bitmap bitmap) {
+        Mat mat = new Mat();
+        Bitmap bmp32 = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Utils.bitmapToMat(bmp32, mat);
+
+        return mat;
+    }
 
     public Mat detectBitmap(Bitmap imageBitmap, int noise, int contours) {
-        Mat matrix = new Mat();
-        Bitmap bmp32 = imageBitmap.copy(Bitmap.Config.ARGB_8888, true);
-        Utils.bitmapToMat(bmp32, matrix);
-
+        Mat matrix = bitmapToMat(imageBitmap);
         return detectMat(matrix, noise, contours);
+    }
+
+    public MatOfPoint findContourBasedOnPoint(Point point, double precision, Mat imageMatrix) {
+        contoursList.clear();
+        Mat tmpMat = new Mat();
+        Imgproc.cvtColor(imageMatrix, tmpMat, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.findContours(tmpMat, contoursList, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        for (MatOfPoint contour : contoursList) {
+            for (Point contourPoint : contour.toArray()) {
+                if (contourPoint.x >= point.x - precision && contourPoint.x < point.x + precision && contourPoint.y >= point.y - precision && contourPoint.y < point.y + precision) {
+                    return contour;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public List<MatOfPoint> findContours(Mat mat) {
+        contoursList.clear();
+        Mat tmpMat = new Mat();
+        Imgproc.cvtColor(mat, tmpMat, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.findContours(tmpMat, contoursList, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        return contoursList;
     }
 
     public void release() {
@@ -111,5 +128,4 @@ public class EdgeDetector {
         this.blurImage.release();
         this.edge.release();
     }
-
 }

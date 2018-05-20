@@ -91,13 +91,13 @@ public class ScannerActivity extends AppCompatActivity implements CameraBridgeVi
             @Override
             public void onClick(View view) {
 
-                Bitmap bm = Bitmap.createBitmap(edge.cols(), edge.rows(),Bitmap.Config.ARGB_8888);
+                Bitmap bm = Bitmap.createBitmap(edge.cols(), edge.rows(), Bitmap.Config.ARGB_8888);
                 Utils.matToBitmap(edge, bm);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
 
-                Intent getEditScreenIntent = new Intent(view.getContext(),EditorActivity.class);
+                Intent getEditScreenIntent = new Intent(view.getContext(), EditorActivity.class);
                 getEditScreenIntent.putExtra("capImg", byteArray);
                 startActivity(getEditScreenIntent);
             }
@@ -160,7 +160,7 @@ public class ScannerActivity extends AppCompatActivity implements CameraBridgeVi
         mRgba = inputFrame.rgba();
         int edgeThreshScharr = scharSeekBar.getProgress();
         int contours = contoursSeekBar.getProgress();
-        edge = edgeDetector.detectMat(mRgba,edgeThreshScharr,contours);
+        edge = edgeDetector.detectMat(mRgba, edgeThreshScharr, contours);
 
         return edge;
     }

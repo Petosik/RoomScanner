@@ -47,7 +47,7 @@ public class ImageBrowserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_browser);
 
-        final Intent imageIntent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        final Intent imageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         imageIntent.setType("image/*");
         startActivityForResult(imageIntent, RESULT_LOAD_IMAGE);
 
@@ -59,23 +59,22 @@ public class ImageBrowserActivity extends AppCompatActivity {
         proceedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Bitmap bm = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+                Bitmap bm = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
 
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
 
-                Intent getEditScreenIntent = new Intent(view.getContext(),EditorActivity.class);
+                Intent getEditScreenIntent = new Intent(view.getContext(), EditorActivity.class);
                 getEditScreenIntent.putExtra("capImg", byteArray);
                 startActivity(getEditScreenIntent);
             }
         });
 
-        scharSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if(originalImgBtm != null) {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (originalImgBtm != null) {
                     int edgeThreshScharr = scharSeekBar.getProgress();
                     int contours = contoursSeekBar.getProgress();
 
@@ -85,24 +84,24 @@ public class ImageBrowserActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
-        });
+        };
+
+        scharSeekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
+        contoursSeekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data ==null) {
+        if (data == null) {
             finish();
-        }
-        else{
-            switch (requestCode){
+        } else {
+            switch (requestCode) {
                 case RESULT_LOAD_IMAGE:
                     Uri selectedImage = data.getData();
                     try {
@@ -118,7 +117,7 @@ public class ImageBrowserActivity extends AppCompatActivity {
                         int edgeThreshScharr = scharSeekBar.getProgress();
                         int contours = contoursSeekBar.getProgress();
 
-                        applyDetection(edgeThreshScharr,contours);
+                        applyDetection(edgeThreshScharr, contours);
                     } catch (IOException e) {
                         Log.i("TAG", "Some exception " + e);
                     }
@@ -131,8 +130,9 @@ public class ImageBrowserActivity extends AppCompatActivity {
         edgeDetector = new EdgeDetector();
         Mat result;
 
-        result = edgeDetector.detectBitmap(originalImgBtm,noise,contours);
-        Bitmap bmpResult = Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888);;
+        result = edgeDetector.detectBitmap(originalImgBtm, noise, contours);
+        Bitmap bmpResult = Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888);
+        ;
 
         Utils.matToBitmap(result, bmpResult);
         imageView.setImageBitmap(bmpResult);
