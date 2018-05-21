@@ -17,16 +17,6 @@ import android.widget.Button;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
-  /*      TODO:Check those permissions at the beginning of application lifecycle!!!
-        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.CAMERA" />
-<uses-feature android:name="android.hardware.camera" />
-<uses-feature android:name="android.hardware.camera.autofocus" />*/
-
-
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 

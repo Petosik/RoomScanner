@@ -6,7 +6,10 @@
     <string name="what_should_we_improve">What should we improve?</string>
     <string name="send">Send</string>
     <string name="noise">Noise</string>
-    <string name="countours">Countours</string>
+    <string name="contours">Contours</string>
     <string name="capture">Capture</string>
     <string name="proceed">Proceed</string>
+    <string name="cut">Cut</string>
+    <string name="reset">reset</string>
+    <string name="save">save</string>
 </resources>

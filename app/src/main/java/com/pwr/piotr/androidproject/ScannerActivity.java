@@ -59,19 +59,11 @@ public class ScannerActivity extends AppCompatActivity implements CameraBridgeVi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.CAMERA)) {
-
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
             } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.CAMERA},
-                        CAMERA_PEMISSION_CODE);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PEMISSION_CODE);
                 this.recreate();
-
             }
         }
 
@@ -108,7 +100,7 @@ public class ScannerActivity extends AppCompatActivity implements CameraBridgeVi
         Point size = new Point();
         display.getSize(size);
         scharSeekBar.getLayoutParams().width = size.y - 400;
-        scharSeekBar.setProgress(50);
+        scharSeekBar.setProgress(100);
         contoursSeekBar.getLayoutParams().width = size.y - 400;
         contoursSeekBar.setProgress(50);
     }

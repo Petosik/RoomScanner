@@ -24,7 +24,6 @@ import java.util.Vector;
  */
 
 public class EdgeDetector {
-    private static final String TAG = "Timer";
     private Mat imgGray, blurImage, edge, dx, dy, hierarchy, result;
     private List<MatOfPoint> contoursList, filteredContoursList;
     private Size blurSize;
@@ -98,18 +97,24 @@ public class EdgeDetector {
         return detectMat(matrix, noise, contours);
     }
 
-    public MatOfPoint findContourBasedOnPoint(Point point, double precision, Mat imageMatrix) {
-        contoursList.clear();
-        Mat tmpMat = new Mat();
-        Imgproc.cvtColor(imageMatrix, tmpMat, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.findContours(tmpMat, contoursList, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+    public MatOfPoint findContourBasedOnPoint(Point point, double precision, List<MatOfPoint> contours) {
 
-        for (MatOfPoint contour : contoursList) {
+        MatOfPoint potentialContour = null;
+        double minDiff = Double.MAX_VALUE;
+
+        for (MatOfPoint contour : contours) {
             for (Point contourPoint : contour.toArray()) {
                 if (contourPoint.x >= point.x - precision && contourPoint.x < point.x + precision && contourPoint.y >= point.y - precision && contourPoint.y < point.y + precision) {
-                    return contour;
+                    double distance = Math.sqrt(Math.pow(contourPoint.x - point.x, 2) + Math.pow(contourPoint.y - point.y, 2));
+                    if (distance <= minDiff) {
+                        minDiff = distance;
+                        potentialContour = contour;
+                    }
                 }
             }
+        }
+        if (potentialContour != null) {
+            return potentialContour;
         }
 
         return null;
@@ -121,6 +126,34 @@ public class EdgeDetector {
         Imgproc.cvtColor(mat, tmpMat, Imgproc.COLOR_BGR2GRAY);
         Imgproc.findContours(tmpMat, contoursList, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         return contoursList;
+    }
+
+    public MatOfPoint getContourFromList(MatOfPoint contour, List<MatOfPoint> contourList) {
+        boolean isContourTheSame = false;
+        for (MatOfPoint cont : contourList) {
+            if (cont.toArray().length == contour.toArray().length) {
+                boolean isPointTheSame = false;
+                for (int i = 0; i < cont.toArray().length; i++) {
+                    isPointTheSame = cont.toArray()[i].x == contour.toArray()[i].x && cont.toArray()[i].y == contour.toArray()[i].y;
+                    if (!isPointTheSame)
+                        break;
+                }
+                isContourTheSame = isPointTheSame;
+            }
+            if (isContourTheSame) {
+                return cont;
+            }
+        }
+        return null;
+    }
+
+    public boolean doesListContainContour(List<MatOfPoint> listOfContour, MatOfPoint contour) {
+        MatOfPoint chosenContour = this.getContourFromList(contour, listOfContour);
+        if (chosenContour == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public void release() {
