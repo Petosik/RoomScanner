@@ -105,11 +105,11 @@ public class EditorActivity extends AppCompatActivity {
                 if (chosenContour != null) {
                     boolean isAlreadyChosen = edgeDetector.doesListContainContour(chosenContours, chosenContour);
                     if (isAlreadyChosen) {
-                        whiteContoursToBeDisplayed.add(chosenContour);
+                        //whiteContoursToBeDisplayed.add(chosenContour);
                         chosenContours.remove(edgeDetector.getContourFromList(chosenContour, chosenContours));
                     } else {
                         chosenContours.add(chosenContour);
-                        whiteContoursToBeDisplayed.remove(edgeDetector.getContourFromList(chosenContour, whiteContoursToBeDisplayed));
+                        //whiteContoursToBeDisplayed.remove(edgeDetector.getContourFromList(chosenContour, whiteContoursToBeDisplayed));
                     }
                     drawContoursOnMatch(isAlreadyChosen, chosenContour);
                 }
@@ -196,8 +196,8 @@ public class EditorActivity extends AppCompatActivity {
             List<MatOfPoint> chosenContoursTmp = new ArrayList<MatOfPoint>();
             chosenContoursTmp.add(chosenContour);
             for (int i = 0; i < chosenContoursTmp.size(); i++) {
-                Imgproc.drawContours(resultImageMat, chosenContours, i, blackColorHex, 2);
-                Imgproc.drawContours(resultImageMat, chosenContours, i, whiteColorHex, 2);
+                Imgproc.drawContours(resultImageMat, chosenContoursTmp, i, blackColorHex, 2);
+                Imgproc.drawContours(resultImageMat, chosenContoursTmp, i, whiteColorHex, 2);
             }
         } else {
             for (int i = 0; i < chosenContours.size(); i++) {
