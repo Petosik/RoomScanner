@@ -47,7 +47,7 @@ public class ImageBrowserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_browser);
 
-        final Intent imageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        final Intent imageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         imageIntent.setType("image/*");
         startActivityForResult(imageIntent, RESULT_LOAD_IMAGE);
 
@@ -109,7 +109,7 @@ public class ImageBrowserActivity extends AppCompatActivity {
                         Point size = new Point();
                         display.getSize(size);
                         scharSeekBar.getLayoutParams().width = size.y - 400;
-                        scharSeekBar.setProgress(50);
+                        scharSeekBar.setProgress(100);
                         contoursSeekBar.getLayoutParams().width = size.y - 400;
                         contoursSeekBar.setProgress(50);
 

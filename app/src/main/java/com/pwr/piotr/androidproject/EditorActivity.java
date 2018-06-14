@@ -1,16 +1,11 @@
 package com.pwr.piotr.androidproject;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,9 +26,10 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
 
 public class EditorActivity extends AppCompatActivity {
     private static final int WRITE_EXTERNAL_STORAGE_CODE = 1;
@@ -42,6 +38,7 @@ public class EditorActivity extends AppCompatActivity {
     Point touchPoint;
     List<MatOfPoint> chosenContours;
     List<MatOfPoint> whiteContoursToBeDisplayed;
+    List<MatOfPoint> originalImageContours;
     Mat originalImageMat;
     final Scalar neonColorHex = new Scalar(57, 255, 20);
     final Scalar whiteColorHex = new Scalar(255, 255, 255);
@@ -76,8 +73,16 @@ public class EditorActivity extends AppCompatActivity {
 
         Bitmap bmp32 = imageBitmap.copy(Bitmap.Config.ARGB_8888, true);
         Utils.bitmapToMat(bmp32, originalImageMat);
-        whiteContoursToBeDisplayed = edgeDetector.findContours(originalImageMat);
+        originalImageContours = edgeDetector.findContours(originalImageMat);
+        List<Mat> whiteTmp = new ArrayList<Mat>();
+        whiteContoursToBeDisplayed = new ArrayList<MatOfPoint>();
+        cloneContours(originalImageContours, whiteContoursToBeDisplayed);
+
         resultImageMat = new Mat(originalImageMat.rows(), originalImageMat.cols(), CvType.CV_8UC3, blackColorHex);
+
+        for (int i = 0; i < originalImageContours.size(); i++) {
+            Imgproc.drawContours(resultImageMat, originalImageContours, i, whiteColorHex, 2);
+        }
 
         imageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -106,7 +111,7 @@ public class EditorActivity extends AppCompatActivity {
                         chosenContours.add(chosenContour);
                         whiteContoursToBeDisplayed.remove(edgeDetector.getContourFromList(chosenContour, whiteContoursToBeDisplayed));
                     }
-                    drawContours();
+                    drawContoursOnMatch(isAlreadyChosen, chosenContour);
                 }
             }
         });
@@ -117,7 +122,7 @@ public class EditorActivity extends AppCompatActivity {
                 if (!chosenContours.isEmpty()) {
                     whiteContoursToBeDisplayed = new ArrayList<MatOfPoint>(chosenContours);
                     chosenContours.clear();
-                    drawContours();
+                    drawContoursOnCut();
                     resettingButton.setVisibility(View.VISIBLE);
                     savingButton.setVisibility(View.VISIBLE);
                 }
@@ -127,9 +132,9 @@ public class EditorActivity extends AppCompatActivity {
         resettingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                whiteContoursToBeDisplayed = edgeDetector.findContours(originalImageMat);
+                cloneContours(originalImageContours, whiteContoursToBeDisplayed);
                 chosenContours.clear();
-                drawContours();
+                drawContoursOnReset();
                 resettingButton.setVisibility(View.INVISIBLE);
                 savingButton.setVisibility(View.INVISIBLE);
             }
@@ -138,51 +143,27 @@ public class EditorActivity extends AppCompatActivity {
         savingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    } else {
-                        ActivityCompat.requestPermissions((Activity) getApplicationContext(), new String[]{Manifest.permission.CAMERA}, WRITE_EXTERNAL_STORAGE_CODE);
-                        ((Activity) getApplicationContext()).recreate();
-                    }
-                }
-
-
                 Bitmap bitmapToBeSaved = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                FileOutputStream out = null;
-                String filename = "edited_" + System.currentTimeMillis() + ".jpeg";
+                String filename = "edited_" + System.currentTimeMillis() + ".jpg";
+                String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+                File myDir = new File(root);
+                myDir.mkdirs();
 
-                File sd = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
-                File dest = new File(sd, filename);
-
+                File file = new File(myDir, filename);
                 try {
-                    out = new FileOutputStream(dest);
-                    bitmapToBeSaved.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    FileOutputStream out = new FileOutputStream(file);
+                    bitmapToBeSaved.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                    out.flush();
+                    out.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d("TAG", e.getMessage());
-                } finally {
-                    try {
-                        if (out != null) {
-                            out.close();
-                            Log.d("TAG", "OK!!");
-                        }
-                    } catch (IOException e) {
-                        Log.d("TAG", e.getMessage() + "Error");
-                        e.printStackTrace();
-                    }
                 }
             }
         });
     }
 
-    private void drawContours() {
-        resultImageMat.setTo(blackColorHex);
-        for (int i = 0; i < whiteContoursToBeDisplayed.size(); i++) {
-            Imgproc.drawContours(resultImageMat, whiteContoursToBeDisplayed, i, whiteColorHex, 2);
-        }
-        for (int i = 0; i < chosenContours.size(); i++) {
-            Imgproc.drawContours(resultImageMat, chosenContours, i, neonColorHex, 2);
-        }
+    private void drawContoursToImage() {
         Bitmap resultImageBitmap = Bitmap.createBitmap(resultImageMat.cols(), resultImageMat.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(resultImageMat, resultImageBitmap);
         imageView.setImageBitmap(resultImageBitmap);
@@ -191,6 +172,45 @@ public class EditorActivity extends AppCompatActivity {
             cuttingButton.setVisibility(View.GONE);
         } else {
             cuttingButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void drawContoursOnReset() {
+        resultImageMat.setTo(blackColorHex);
+        for (int i = 0; i < whiteContoursToBeDisplayed.size(); i++) {
+            Imgproc.drawContours(resultImageMat, whiteContoursToBeDisplayed, i, whiteColorHex, 2);
+        }
+        drawContoursToImage();
+    }
+
+    private void drawContoursOnCut() {
+        resultImageMat.setTo(blackColorHex);
+        for (int i = 0; i < whiteContoursToBeDisplayed.size(); i++) {
+            Imgproc.drawContours(resultImageMat, whiteContoursToBeDisplayed, i, whiteColorHex, 2);
+        }
+        drawContoursToImage();
+    }
+
+    private void drawContoursOnMatch(boolean isAlreadyChosen, MatOfPoint chosenContour) {
+        if (isAlreadyChosen) {
+            List<MatOfPoint> chosenContoursTmp = new ArrayList<MatOfPoint>();
+            chosenContoursTmp.add(chosenContour);
+            for (int i = 0; i < chosenContoursTmp.size(); i++) {
+                Imgproc.drawContours(resultImageMat, chosenContours, i, blackColorHex, 2);
+                Imgproc.drawContours(resultImageMat, chosenContours, i, whiteColorHex, 2);
+            }
+        } else {
+            for (int i = 0; i < chosenContours.size(); i++) {
+                Imgproc.drawContours(resultImageMat, chosenContours, i, blackColorHex, 2);
+                Imgproc.drawContours(resultImageMat, chosenContours, i, neonColorHex, 2);
+            }
+        }
+        drawContoursToImage();
+    }
+
+    private void cloneContours(List<MatOfPoint> from, List<MatOfPoint> to) {
+        for (Mat contour : from) {
+            to.add(from.indexOf(contour), new MatOfPoint(contour.clone()));
         }
     }
 }
